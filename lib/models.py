@@ -55,3 +55,34 @@ Base.metadata.create_all(engine)
 # Create a new session to interact with the database
 Session = sessionmaker(bind=engine)
 session = Session()
+
+# Example usage
+if __name__ == "__main__":
+    # Create a new role
+    role = Role(character_name="Hamlet")
+    session.add(role)
+    session.commit()
+
+    # Create new auditions for the role
+    audition1 = Audition(actor="jason Kamau ", location="kakamega", phone=254738292456, role_id=role.id)
+    audition2 = Audition(actor="jessica wairimu", location="Nairobi", phone=254744258485, role_id=role.id)
+    session.add(audition1)
+    session.add(audition2)
+    session.commit()
+
+    # Mark the first audition as hired
+    audition1.call_back()
+    session.commit()
+
+    # Retrieve and print role details
+    retrieved_role = session.query(Role).filter_by(character_name="Hamlet").first()
+    print(f"Role: {retrieved_role.character_name}")
+    print(f"Actors: {retrieved_role.actors()}")
+    print(f"Locations: {retrieved_role.locations()}")
+    print(f"Lead: {retrieved_role.lead().actor if isinstance(retrieved_role.lead(), Audition) else retrieved_role.lead()}")
+    print(f"Understudy: {retrieved_role.understudy().actor if isinstance(retrieved_role.understudy(), Audition) else retrieved_role.understudy()}")
+
+    # Print all roles and auditions in the database
+    all_roles = session.query(Role).all()
+    all_auditions = session.query(Audition).all()
+
